@@ -4,23 +4,20 @@ from random import randrange
 #Create classifier from trained data
 classifier = cv2.CascadeClassifier('haarcascade_frontalface_default.xml')
 
-#Choose example image 
-img = cv2.imread('TS.jpg')
+#capture video from webcame
+webcam = cv2.VideoCapture(0) #use 0 for webcam, file path name for videos
 
-#Convert source image (img), 2nd parameter is conversion method (BGR to grayscale)
-gs_img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+while True:
+    success_read, frame = webcam.read() #boolean if read successfully an the actual frame
+    gs_img = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    face_coords = classifier.detectMultiScale(gs_img)
+    for(x, y, w, h) in face_coords:
+        cv2.rectangle(frame, (x, y), (x+w, y+h), (randrange(128,256), randrange(128,256), randrange(128,256)), 2)
+    cv2.imshow('Real time detection', frame)
+    key = cv2.waitKey(1) 
+    #wait for a key for a ms, so 
+    #a frame every millisecond, without waitKey frame does not display
+    if key == 81 or key == 113:
+        break
 
-#Detect faces, returned as list of rectangles of where the face is
-#for the face coords, it is a tuple of size 4:
-# x-axis start point, y-axis start point, width, and height
-face_coords = classifier.detectMultiScale(gs_img) 
-
-#draw each rectangle with start point, endpoint, color of drawn rectangle, thickness
-for(x, y, w, h) in face_coords:
-    cv2.rectangle(img, (x, y), (x+w, y+h), (randrange(128,256), randrange(128,256), randrange(128,256)), 2)
-
-#Show image. Wait until any key is pressed to close window
-cv2.imshow('Showing Imported Face', img)
-cv2.waitKey()
-
-print("Code completed") 
+webcam.release()
